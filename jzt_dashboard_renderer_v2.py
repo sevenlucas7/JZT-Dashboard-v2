@@ -125,77 +125,43 @@ V2_READABILITY_CSS = """
     font-size: 22px !important;  /* 原 18px → 22px */
   }
 
-  /* 日期选择器样式 */
+  /* —— DATE SELECTOR (header right, compact) —— */
   .date-selector {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 14px;
-    padding: 10px 18px;
-    background: var(--bg-card);
-    border: 1px solid var(--rule);
-    border-radius: 12px;
-    margin-bottom: 24px;
-    box-shadow: 0 1px 3px var(--shadow-blue-2);
-  }
-  .date-selector label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-2);
-    white-space: nowrap;
-    letter-spacing: 0.02em;
+    gap: 6px;
   }
   .date-selector select {
-    flex: 1;
-    max-width: 280px;
-    padding: 9px 36px 9px 14px;
+    padding: 4px 28px 4px 10px;
     border: 1px solid var(--rule);
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 6px;
+    font-size: 11.5px;
     font-family: 'Inter', 'Noto Sans SC', sans-serif;
     background: var(--bg-soft);
     color: var(--ink-1);
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a5a58' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235a5a58' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 14px center;
+    background-position: right 8px center;
     transition: border-color 0.15s, box-shadow 0.15s;
+    min-width: 110px;
   }
   .date-selector select:hover {
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px var(--brand-soft);
   }
   .date-selector select:focus {
     outline: none;
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px var(--brand-soft);
+    box-shadow: 0 0 0 2px var(--brand-soft);
   }
-  .date-selector .live-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: auto;
-    padding: 5px 10px;
-    background: rgba(26,174,57,0.10);
-    border: 1px solid rgba(26,174,57,0.20);
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--ok);
-  }
-  .date-selector .live-badge::before {
-    content: "";
+  .date-selector .live-dot {
     width: 6px;
     height: 6px;
     background: var(--ok);
     border-radius: 50%;
-    animation: livePulse 1.8s infinite;
-  }
-  .date-selector .live-badge.hidden { display: none; }
-  @keyframes livePulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
+    flex-shrink: 0;
   }
 
   /* Loading 状态 */
@@ -252,21 +218,15 @@ def build_date_selector_html(dates_index: dict, current_date: str) -> str:
     for item in sorted(available, key=lambda x: x["date"], reverse=True):
         date_str = item["date"]
         slot = item["slot"]
-        label = f"{date_str} ({slot})"
+        label = f"{date_str}"
         selected = 'selected="selected"' if date_str == current_date else ''
         options.append(f'<option value="{date_str}" {selected}>{label}</option>')
 
     options_html = "\n".join(options)
     is_live = current_date == latest_date
 
-    return f'''
-<div class="date-selector">
-  <label>📅 历史数据</label>
-  <select id="date-select" onchange="loadDateData(this.value)">
-    {options_html}
-  </select>
-  <span class="current-badge" id="live-badge" style="{'' if is_live else 'display:none'}">实时</span>
-</div>'''
+    # Compact version for header-right placement
+    return f'''<span class="date-selector"><select id="date-select" onchange="loadDateData(this.value)">{options_html}</select><span class="live-dot" id="live-dot" style="{"display:inline-block" if is_live else "display:none"}></span></span>'''
 
 
 def build_v2_html(
@@ -311,22 +271,14 @@ def build_v2_html(
     else:
         body_start = dashboard_html.index("<html lang=") + len("<html lang=>")
 
-    # Find where to inject date selector - after header, before meta-bar or kpi-strip
     body_content = dashboard_html[body_start:]
 
-    # Remove existing closing tags and reconstruct with V2 elements
-    # Inject date selector after meta-bar
-    if '<div class="meta-bar">' in body_content:
-        meta_bar_end = body_content.index('</div>', body_content.index('<div class="meta-bar">')) + len('</div>')
-        before_meta = body_content[:meta_bar_end + 1]
-        after_meta = body_content[meta_bar_end + 1:]
-
-        # Find kpi-strip position
-        kpi_pos = after_meta.index('<div class="kpi-strip">') if '<div class="kpi-strip">' in after_meta else 0
-        before_kpi = after_meta[:kpi_pos]
-        kpi_section = after_meta[kpi_pos:]
-
-        new_body = before_meta + date_selector + before_kpi + kpi_section
+    # Inject date selector into header-right area, before the live-pill
+    new_body = body_content
+    if '<span class="live-pill">' in body_content:
+        # Replace the live-pill span with date-selector + live-pill
+        live_pill_pos = body_content.index('<span class="live-pill">')
+        new_body = body_content[:live_pill_pos] + date_selector + body_content[live_pill_pos:]
     else:
         new_body = date_selector + body_content
 
