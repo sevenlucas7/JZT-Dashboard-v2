@@ -4,7 +4,7 @@
 生成 V2 专用 index.html 和 dates_index.json，同步到 JZT-Dashboard-v2 仓库。
 
 Usage:
-    python3 jzt_sync_v2.py --data-dir ~/JZT报数/data --output-dir ~/JZT-Dashboard-v2
+    python3 jzt_sync_v2.py --data-dir ~/JZT报数/data --output-dir "/Users/sevenyip/claude project/JZT-Dashboard-v2"
 """
 from __future__ import annotations
 

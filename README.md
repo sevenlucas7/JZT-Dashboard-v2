@@ -19,7 +19,7 @@
 ## 本地仓库
 
 ```
-~/JZT-Dashboard-v2/
+/Users/sevenyip/claude project/JZT-Dashboard-v2/
 ├── data/                  ← split.json 历史数据
 │   ├── dates_index.json   ← 可用日期索引（V2 专用）
 │   └── *_split.json       ← 历史 split 文件
@@ -38,9 +38,9 @@ V2 有独立的 sync 脚本，需要在 Hermes cron 中添加调用：
 
 ```bash
 # V2 sync（推荐每2小时运行）
-python3 ~/JZT-Dashboard-v2/jzt_sync_v2.py \
+python3 "/Users/sevenyip/claude project/JZT-Dashboard-v2/jzt_sync_v2.py" \
     --data-dir ~/JZT报数/data \
-    --output-dir ~/JZT-Dashboard-v2
+    --output-dir "/Users/sevenyip/claude project/JZT-Dashboard-v2"
 ```
 
 **建议 cron 安排**（与 V1 预计算配合）：
@@ -68,11 +68,11 @@ V2 使用 JavaScript 动态加载历史数据：
 
 ```bash
 # 手动运行 V2 sync
-cd ~/JZT-Dashboard-v2
-python3 jzt_sync_v2.py --data-dir ~/JZT报数/data --output-dir ~/JZT-Dashboard-v2
+cd "/Users/sevenyip/claude project/JZT-Dashboard-v2"
+python3 jzt_sync_v2.py --data-dir ~/JZT报数/data --output-dir "/Users/sevenyip/claude project/JZT-Dashboard-v2"
 
 # 本地查看（需启动 HTTP 服务器）
-cd ~/JZT-Dashboard-v2
+cd "/Users/sevenyip/claude project/JZT-Dashboard-v2"
 python3 -m http.server 8080
 # 浏览器打开 http://localhost:8080
 ```
@@ -82,7 +82,7 @@ python3 -m http.server 8080
 ## GitHub 操作
 
 ```bash
-cd ~/JZT-Dashboard-v2
+cd "/Users/sevenyip/claude project/JZT-Dashboard-v2"
 
 # 推送到 GitHub（首次设置 remote）
 git remote set-url origin https://github.com/sevenlucas7/JZT-Dashboard-v2.git
