@@ -1,0 +1,16 @@
+{
+  "available_dates": [
+    {
+      "date": "2026-06-04",
+      "slot": "2357",
+      "split_file": "2026-06-04_2357_split.json"
+    },
+    {
+      "date": "2026-06-03",
+      "slot": "2357",
+      "split_file": "2026-06-03_2357_split.json"
+    }
+  ],
+  "latest": "2026-06-04",
+  "generated_at": "2026-06-05 02:01:25"
+}
